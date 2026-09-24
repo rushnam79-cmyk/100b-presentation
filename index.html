@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100억 프로젝트 — 진행현황 발표</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root{
+    --navy:#0f1b2d;
+    --navy-2:#16263c;
+    --charcoal:#1c2733;
+    --gold:#c9a15f;
+    --gold-soft:#e4cfa0;
+    --white:#ffffff;
+    --ink:#22303f;
+    --muted:#6b7a8c;
+    --line:#e4e8ec;
+  }
+  *{box-sizing:border-box;}
+  html{
+    scroll-behavior:smooth;
+  }
+  html,body{
+    margin:0; padding:0;
+    background:#ffffff;
+    font-family:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+  }
+
+  /* ---------- Ambient motion graphic (whole page) ---------- */
+  .bg-motion{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; will-change:transform; }
+  .bg-blob{ position:absolute; border-radius:50%; filter:blur(55px); opacity:0.12; will-change:transform; }
+  .bg-blob.a{ width:480px; height:480px; background:var(--gold); top:2%; left:-12%; animation: float1 16s ease-in-out infinite; }
+  .bg-blob.b{ width:420px; height:420px; background:var(--navy); top:38%; right:-10%; animation: float2 19s ease-in-out infinite; }
+  .bg-blob.c{ width:360px; height:360px; background:var(--gold); bottom:4%; left:18%; animation: float3 14s ease-in-out infinite; }
+
+  .blob{ position:absolute; border-radius:50%; filter:blur(60px); opacity:0.55; pointer-events:none; }
+  .blob1{ width:520px; height:520px; background:radial-gradient(circle, rgba(201,161,95,0.55), transparent 70%); top:-140px; right:-120px; animation: float1 9s ease-in-out infinite; }
+  .blob2{ width:380px; height:380px; background:radial-gradient(circle, rgba(80,110,150,0.5), transparent 70%); bottom:-100px; left:-80px; animation: float2 11s ease-in-out infinite; }
+  .blob3{ width:260px; height:260px; background:radial-gradient(circle, rgba(201,161,95,0.35), transparent 70%); bottom:140px; right:260px; animation: float3 7s ease-in-out infinite; }
+  @keyframes float1{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(-40px,30px) scale(1.08);} }
+  @keyframes float2{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(30px,-20px) scale(1.1);} }
+  @keyframes float3{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(-20px,-30px) scale(0.9);} }
+
+  /* ---------- Progress bar + dot nav ---------- */
+  .progress-bar{ position:fixed; top:0; left:0; height:4px; width:0%; background:linear-gradient(90deg,var(--gold),var(--gold-soft)); z-index:60; transition:width .12s linear; }
+  .dot-nav{ position:fixed; right:26px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:14px; z-index:60; }
+  .dot-nav button{ width:10px; height:10px; border-radius:50%; border:none; padding:0; cursor:pointer; background:rgba(120,130,145,0.35); transition:background .3s, transform .3s; }
+  .dot-nav button.active{ background:var(--gold); transform:scale(1.5); }
+
+  /* ---------- Reveal-on-scroll ---------- */
+  .reveal{
+    opacity:0; transform:translateY(28px);
+    transition:opacity .8s cubic-bezier(.22,.61,.36,1), transform .8s cubic-bezier(.22,.61,.36,1);
+  }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+  .title .line, .cover-title .line{ display:block; }
+
+  /* ---------- Section base ---------- */
+  .section{
+    position:relative; width:100%; overflow:hidden;
+    padding:130px 7vw 100px; min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center;
+    background:var(--white); color:var(--ink);
+  }
+  .section.dark{ background:var(--navy); color:#fff; }
+  .section-inner{ max-width:1240px; width:100%; margin:0 auto; position:relative; z-index:1; }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:12px;
+    font-size:clamp(16px,1.5vw,23px); font-weight:700; letter-spacing:0.02em;
+    color:var(--gold); margin-bottom:22px;
+  }
+  .eyebrow::before{
+    content:""; width:32px; height:4px; background:var(--gold); display:inline-block; border-radius:2px;
+  }
+  h1.title{
+    font-size:clamp(34px,4.6vw,68px); font-weight:800; line-height:1.24; color:var(--navy);
+    margin:0 0 18px 0; letter-spacing:-0.01em;
+  }
+  .subtitle{
+    font-size:clamp(17px,1.8vw,28px); color:var(--muted); margin:0 0 56px 0; font-weight:500;
+  }
+  .page-no{
+    position:absolute; top:44px; right:7vw;
+    font-size:16px; font-weight:700; color:var(--muted); z-index:2;
+  }
+  .page-no b{ color:var(--navy); }
+  .section.dark .page-no{ color:#7e8fa3; }
+  .section.dark .page-no b{ color:#fff; }
+
+  /* ---------- 핵심 성과 ---------- */
+  .stat-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:32px; margin-top:8px;
+  }
+  .stat-card{
+    background:var(--navy);
+    border-radius:24px;
+    padding:44px 34px;
+    min-height:300px;
+    display:flex; flex-direction:column; justify-content:space-between;
+    position:relative;
+    overflow:hidden;
+    text-decoration:none; color:inherit; cursor:pointer;
+    transition:transform .38s cubic-bezier(.22,.61,.36,1), box-shadow .38s cubic-bezier(.22,.61,.36,1);
+  }
+  .stat-card:hover, .stat-card:focus-visible{
+    transform:translateY(-10px);
+    box-shadow:0 24px 48px rgba(15,27,45,0.35);
+  }
+  .stat-card::after{
+    content:""; position:absolute; right:-40px; bottom:-40px;
+    width:160px; height:160px; border-radius:50%;
+    background:radial-gradient(circle, rgba(201,161,95,0.28), transparent 70%);
+    transition:transform .5s ease, opacity .5s ease;
+  }
+  .stat-card:hover::after{ transform:scale(1.25); opacity:1.2; }
+  .stat-num{
+    font-size:76px; font-weight:800; color:var(--gold-soft); line-height:1;
+    margin-bottom:20px; letter-spacing:-0.02em;
+    transition:transform .38s cubic-bezier(.22,.61,.36,1);
+  }
+  .stat-card:hover .stat-num{ transform:translateX(4px); }
+  .stat-num span{ font-size:34px; font-weight:700; margin-left:2px; }
+  .stat-label{ font-size:24px; color:#e6ecf2; font-weight:700; line-height:1.4; margin-bottom:14px; }
+  .stat-sub{ font-size:17px; color:#9db0c4; line-height:1.5; }
+  .stat-link-hint{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:16px; font-size:14px; font-weight:700; color:var(--gold-soft);
+    opacity:0; transform:translateX(-8px);
+    transition:opacity .3s ease, transform .3s ease;
+  }
+  .stat-card:hover .stat-link-hint, .stat-card:focus-visible .stat-link-hint{
+    opacity:1; transform:translateX(0);
+  }
+
+  .foot-note{
+    margin-top:48px; display:flex; align-items:center; gap:16px;
+    padding:30px 34px; background:#f6f4ee; border-radius:16px;
+    border:1px solid var(--line);
+  }
+  .foot-note .dot{ width:12px; height:12px; border-radius:50%; background:var(--gold); flex:0 0 auto; }
+  .foot-note p{ margin:0; font-size:21px; color:var(--navy); font-weight:600; line-height:1.5; }
+  .foot-note p em{ font-style:normal; color:var(--gold); }
+  .foot-note p em a{ color:inherit; text-decoration:underline; text-decoration-color:var(--gold); text-underline-offset:3px; transition:color .2s ease; }
+  .foot-note p em a:hover{ color:var(--navy); }
+
+  /* ---------- 실행 시스템 (파이프라인) ---------- */
+  .pipeline{
+    display:flex; align-items:stretch; gap:0; margin-top:32px; flex-wrap:wrap;
+  }
+  .pipe-step{
+    flex:1; min-width:140px; display:flex; flex-direction:column; align-items:center; text-align:center;
+    padding:0 10px;
+  }
+  .pipe-num{
+    width:76px; height:76px; border-radius:50%;
+    background:var(--navy); color:var(--gold-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-size:30px; font-weight:800; margin-bottom:22px;
+    flex:0 0 auto;
+    box-shadow:0 12px 28px rgba(15,27,45,0.18);
+  }
+  .pipe-label{ font-size:21px; font-weight:700; color:var(--navy); line-height:1.35; min-height:60px; }
+  .pipe-sub{ font-size:16px; color:var(--muted); margin-top:12px; line-height:1.4; }
+  .pipe-arrow{
+    flex:0 0 auto; width:40px; display:flex; align-items:center; justify-content:center;
+    color:var(--gold); font-size:28px; font-weight:700; margin-top:38px;
+  }
+
+  .system-caption{
+    margin-top:64px; padding:36px 40px; border-radius:20px;
+    background:var(--navy); color:var(--white);
+    display:flex; align-items:center; justify-content:space-between; gap:28px; flex-wrap:wrap;
+  }
+  .system-caption .txt{ font-size:21px; font-weight:600; line-height:1.55; }
+  .system-caption .txt b{ color:var(--gold-soft); }
+  .system-caption .badge{
+    flex:0 0 auto; font-size:17px; font-weight:700; color:var(--navy);
+    background:var(--gold-soft); padding:14px 24px; border-radius:999px; white-space:nowrap;
+  }
+
+  /* ---------- Cover / Closing ---------- */
+  .section.dark{ justify-content:center; }
+  .cover-eyebrow{ font-size:clamp(14px,1.4vw,20px); color:var(--gold-soft); letter-spacing:0.32em; text-transform:uppercase; font-weight:700; margin-bottom:30px; }
+  .cover-title{ font-size:clamp(40px,7vw,104px); font-weight:800; line-height:1.08; margin:0 0 30px 0; letter-spacing:-0.02em; }
+  .cover-title .accent{ color:var(--gold-soft); }
+  .cover-title .line{ position:relative; }
+  .cover-title .line.reveal{ opacity:1; transform:none; transition:none; }
+  .cover-title .line .char{
+    display:inline-block;
+    opacity:0;
+    transform:translateX(-22px);
+    transition:opacity .5s cubic-bezier(.22,.61,.36,1), transform .5s cubic-bezier(.22,.61,.36,1);
+  }
+  .cover-title .line.in .char{ opacity:1; transform:translateX(0); }
+  .cover-title .line::after{
+    content: attr(data-text);
+    position:absolute; left:0; top:0; right:0;
+    background:linear-gradient(100deg, transparent 30%, rgba(255,255,255,0.95) 45%, rgba(228,207,160,0.95) 55%, transparent 70%);
+    background-size:300% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shimmer 5s ease-in-out infinite;
+    pointer-events:none;
+  }
+  .cover-title .line::before{
+    content:""; position:absolute; left:0; bottom:-10px; height:4px; width:56px;
+    background:var(--gold); border-radius:2px;
+    animation:barmove 3.4s ease-in-out infinite;
+  }
+  @keyframes shimmer{ 0%{ background-position:130% 0; } 100%{ background-position:-70% 0; } }
+  @keyframes barmove{ 0%,100%{ transform:translateX(0); opacity:0.45; width:56px; } 50%{ transform:translateX(36px); opacity:1; width:88px; } }
+  .cover-sub{ font-size:clamp(17px,2vw,27px); color:#aebccb; font-weight:500; max-width:920px; line-height:1.55; }
+  .cover-date{ margin-top:64px; font-size:17px; color:#7e8fa3; font-weight:600; letter-spacing:0.05em; }
+  .growth-line{ position:absolute; right:4vw; bottom:6vh; width:min(38vw,480px); opacity:0.9; }
+  .growth-line path{ fill:none; stroke:var(--gold-soft); stroke-width:3; stroke-linecap:round; stroke-dasharray:600; stroke-dashoffset:600; animation:drawline 2.6s .4s ease-out forwards; }
+  .growth-line circle{ fill:var(--gold-soft); opacity:0; animation:dotpop .5s 2.6s ease-out forwards; }
+  @keyframes drawline{ to{ stroke-dashoffset:0; } }
+  @keyframes dotpop{ to{ opacity:1; } }
+
+  /* ---------- 사업 구조 ---------- */
+  .line-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:26px; margin-top:8px; position:relative; z-index:1; }
+  .line-card{
+    position:relative; border-radius:24px; padding:34px 28px;
+    background:linear-gradient(160deg, #101b2d 0%, #1b2c46 100%);
+    border:1px solid rgba(255,255,255,0.07);
+    box-shadow:0 24px 50px rgba(10,18,30,0.3);
+    transition:transform .4s cubic-bezier(.22,.61,.36,1), box-shadow .4s cubic-bezier(.22,.61,.36,1);
+  }
+  .line-card:hover{ transform:translateY(-8px); box-shadow:0 36px 70px rgba(10,18,30,0.45); }
+  .line-card .icon-badge{
+    width:50px; height:50px; border-radius:15px; display:flex; align-items:center; justify-content:center;
+    font-size:23px; margin-bottom:18px;
+    background:rgba(228,207,160,0.12); border:1px solid rgba(228,207,160,0.25);
+  }
+  .line-card .tag{
+    display:inline-block; font-size:12.5px; font-weight:800; letter-spacing:0.02em;
+    color:var(--gold-soft); background:rgba(228,207,160,0.1);
+    border:1px solid rgba(228,207,160,0.28);
+    padding:6px 14px; border-radius:999px; margin-bottom:16px;
+  }
+  .line-card h3{ font-size:20px; margin:0 0 10px 0; color:#fff; font-weight:800; line-height:1.3; }
+  .line-card p{ font-size:15px; color:#c3d0de; line-height:1.55; margin:0; }
+
+  .org-flow{
+    margin-top:44px; position:relative; overflow:hidden;
+    display:flex; align-items:center; gap:0; flex-wrap:wrap;
+    background:linear-gradient(135deg, #0b1420 0%, #1c3252 100%);
+    border-radius:26px; padding:40px 44px;
+    box-shadow:0 30px 60px rgba(10,18,30,0.35);
+  }
+  .org-flow::after{
+    content:""; position:absolute; top:50%; left:0; width:16px; height:16px;
+    margin-top:-8px; border-radius:50%;
+    background:radial-gradient(circle, #fff 0%, var(--gold-soft) 60%, transparent 80%);
+    box-shadow:0 0 18px 6px rgba(228,207,160,0.5);
+    animation: flowDot 6s linear infinite;
+  }
+  @keyframes flowDot{ 0%{ left:0%; opacity:0; } 6%{ opacity:1; } 94%{ opacity:1; } 100%{ left:100%; opacity:0; } }
+  .org-node{ flex:1; min-width:110px; text-align:center; color:#fff; position:relative; z-index:1; }
+  .org-node .icon{ font-size:24px; margin-bottom:8px; }
+  .org-node .role{ font-size:19px; font-weight:800; margin-bottom:6px; color:var(--gold-soft); }
+  .org-node .desc{ font-size:14px; color:#9db0c4; line-height:1.5; }
+  .org-arrow{ flex:0 0 auto; width:40px; text-align:center; color:var(--gold); font-size:24px; position:relative; z-index:1; }
+
+  /* ---------- 최근 실행 속도 (타임라인) ---------- */
+  .timeline{ margin-top:12px; display:flex; flex-direction:column; gap:20px; }
+  .tl-item{ display:flex; gap:28px; align-items:flex-start; padding:26px 30px; border-radius:18px; background:#f8f7f4; border:1px solid var(--line); flex-wrap:wrap; }
+  .tl-date{ flex:0 0 auto; width:110px; font-size:16px; font-weight:800; color:var(--gold); padding-top:2px; }
+  .tl-body{ flex:1; min-width:220px; }
+  .tl-body h4{ margin:0 0 8px 0; font-size:21px; color:var(--navy); font-weight:800; }
+  .tl-body p{ margin:0; font-size:16px; color:var(--muted); line-height:1.55; }
+
+  /* ---------- 프리미엄 헤더 공통 (모션 블롭 · 글로우 배지 · 시머 텍스트) ---------- */
+  #s2, #s6{ position:relative; }
+  #s2 .float-blob, #s6 .float-blob{ position:absolute; border-radius:50%; filter:blur(70px); pointer-events:none; }
+  #s6 .float-blob.g1{ width:460px; height:460px; background:radial-gradient(circle, rgba(201,161,95,0.30), transparent 70%); top:-120px; right:-80px; animation: float1 13s ease-in-out infinite; }
+  #s6 .float-blob.g2{ width:380px; height:380px; background:radial-gradient(circle, rgba(15,27,45,0.20), transparent 70%); top:200px; left:-120px; animation: float2 16s ease-in-out infinite; }
+  #s6 .float-blob.g3{ width:280px; height:280px; background:radial-gradient(circle, rgba(201,161,95,0.22), transparent 70%); bottom:-40px; right:22%; animation: float3 11s ease-in-out infinite; }
+  #s2 .float-blob.g1{ width:440px; height:440px; background:radial-gradient(circle, rgba(15,27,45,0.16), transparent 70%); top:-100px; left:-100px; animation: float2 15s ease-in-out infinite; }
+  #s2 .float-blob.g2{ width:360px; height:360px; background:radial-gradient(circle, rgba(201,161,95,0.26), transparent 70%); top:120px; right:-90px; animation: float1 12s ease-in-out infinite; }
+  #s2 .float-blob.g3{ width:260px; height:260px; background:radial-gradient(circle, rgba(201,161,95,0.2), transparent 70%); bottom:-30px; left:30%; animation: float3 10s ease-in-out infinite; }
+
+  .eyebrow-glow{
+    position:relative; padding:8px 20px 8px 22px; border-radius:999px;
+    background:rgba(201,161,95,0.08); border:1px solid rgba(201,161,95,0.32);
+  }
+  .eyebrow-glow::before{ display:none; }
+  .eyebrow-glow::after{
+    content:""; position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    width:9px; height:9px; border-radius:50%; background:var(--gold);
+    animation:pulseDot 2.2s ease-out infinite;
+  }
+  @keyframes pulseDot{
+    0%{ box-shadow:0 0 0 0 rgba(201,161,95,0.55); }
+    70%{ box-shadow:0 0 0 14px rgba(201,161,95,0); }
+    100%{ box-shadow:0 0 0 0 rgba(201,161,95,0); }
+  }
+  .text-shine{
+    position:relative;
+    background:linear-gradient(100deg, var(--gold) 20%, #f0cd85 40%, var(--gold) 60%);
+    background-size:220% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:titleShine 5s ease-in-out infinite;
+  }
+  @keyframes titleShine{ 0%,100%{ background-position:0% 0; } 50%{ background-position:100% 0; } }
+  #s2 .title, #s6 .title{ font-size:clamp(36px,5vw,74px); position:relative; z-index:1; }
+  #s2 .subtitle, #s6 .subtitle{ position:relative; z-index:1; }
+
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:36px; margin-top:8px; position:relative; z-index:1; }
+  .col-card{
+    border-radius:28px; padding:44px 40px;
+    background:linear-gradient(160deg, #101b2d 0%, #1b2c46 100%);
+    border:1px solid rgba(255,255,255,0.07);
+    box-shadow:0 30px 60px rgba(10,18,30,0.35);
+    color:#fff;
+    transition:transform .45s cubic-bezier(.22,.61,.36,1), box-shadow .45s cubic-bezier(.22,.61,.36,1);
+  }
+  .col-card:hover{ transform:translateY(-10px); box-shadow:0 44px 90px rgba(10,18,30,0.5); }
+  .col-card h3{ font-size:26px; color:#fff; margin:0 0 16px 0; font-weight:800; }
+  .col-card .status{
+    display:inline-block; font-size:13px; font-weight:800; letter-spacing:0.02em;
+    color:var(--gold-soft); background:rgba(228,207,160,0.12);
+    border:1px solid rgba(228,207,160,0.28);
+    padding:7px 16px; border-radius:999px; margin-bottom:22px;
+  }
+  .col-card ul{ margin:0; padding-left:0; list-style:none; }
+  .col-card li{
+    font-size:16.5px; color:#c3d0de; line-height:1.65; margin-bottom:14px;
+    padding-left:22px; position:relative;
+  }
+  .col-card li::before{
+    content:""; position:absolute; left:0; top:9px; width:8px; height:8px;
+    border-radius:50%; background:var(--gold);
+  }
+  .col-card li a{
+    color:var(--gold-soft); font-weight:700; text-decoration:underline;
+    text-decoration-color:rgba(228,207,160,0.5); text-underline-offset:3px;
+    transition:color .2s ease;
+  }
+  .col-card li a:hover{ color:#fff; }
+
+  .store-showcase{
+    margin-top:40px; display:grid; grid-template-columns:1.1fr 1fr;
+    border-radius:30px; overflow:hidden; position:relative; z-index:1;
+    background:linear-gradient(135deg, #0b1420 0%, #1c3252 55%, #2a3f5f 100%);
+    box-shadow:0 40px 90px rgba(10,18,30,0.45);
+  }
+  .store-showcase::before{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
+    background:radial-gradient(circle at 85% 15%, rgba(228,207,160,0.22), transparent 55%);
+  }
+  .store-showcase::after{
+    content:""; position:absolute; top:0; left:-40%; width:35%; height:100%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
+    transform:skewX(-20deg); pointer-events:none; z-index:2;
+    animation: storeSweep 6s ease-in-out infinite;
+  }
+  @keyframes storeSweep{ 0%{ left:-40%; } 45%{ left:130%; } 100%{ left:130%; } }
+  .store-showcase .store-media{ position:relative; min-height:320px; overflow:hidden; }
+  .store-showcase .store-media img{
+    width:100%; height:100%; object-fit:cover; object-position:top; display:block;
+    transition:transform .6s cubic-bezier(.22,.61,.36,1);
+  }
+  .store-showcase:hover .store-media img{ transform:scale(1.06); }
+  .store-showcase .store-body{ padding:52px 54px; display:flex; flex-direction:column; justify-content:center; color:#fff; position:relative; z-index:3; }
+  .store-badge{
+    display:inline-flex; align-items:center; gap:8px; width:fit-content;
+    font-size:13px; font-weight:800; color:var(--navy);
+    background:var(--gold-soft); padding:8px 18px; border-radius:999px; margin-bottom:20px;
+    box-shadow:0 8px 20px rgba(228,207,160,0.35);
+  }
+  .store-showcase h3{ font-size:clamp(26px,2.6vw,36px); font-weight:800; margin:0 0 16px 0; color:#fff; letter-spacing:-0.01em; }
+  .store-showcase p{ font-size:17px; line-height:1.65; color:#c3d0de; margin:0 0 30px 0; }
+  .store-cta{
+    display:inline-flex; align-items:center; gap:10px; width:fit-content;
+    font-size:17px; font-weight:800; color:var(--navy); background:var(--gold-soft);
+    padding:17px 34px; border-radius:999px; text-decoration:none;
+    box-shadow:0 14px 30px rgba(228,207,160,0.28);
+    transition:transform .3s cubic-bezier(.22,.61,.36,1), box-shadow .3s ease, background .3s ease;
+  }
+  .store-cta:hover{ transform:translateY(-4px) scale(1.02); box-shadow:0 20px 40px rgba(228,207,160,0.45); background:#fff; }
+  @media (max-width:900px){
+    .store-showcase{ grid-template-columns:1fr; }
+    .store-showcase .store-media{ min-height:220px; }
+  }
+
+  /* ---------- 다음 단계 ---------- */
+  .diagnosis{ margin-top:8px; display:flex; gap:30px; align-items:stretch; flex-wrap:wrap; }
+  .diag-card{ flex:1; min-width:280px; border-radius:22px; padding:36px 32px; }
+  .diag-card p{ font-size:17px; line-height:1.6; margin:0 0 8px 0; }
+  .diag-card.plan{
+    background:linear-gradient(135deg, var(--navy) 0%, #1c3252 100%);
+    color:#fff;
+    padding:64px 68px;
+    border-radius:28px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 28px 60px rgba(15,27,45,0.32);
+  }
+  .diag-card.plan::after{
+    content:""; position:absolute; right:-70px; top:-70px;
+    width:260px; height:260px; border-radius:50%;
+    background:radial-gradient(circle, rgba(201,161,95,0.32), transparent 70%);
+  }
+  .diag-card.plan h4{
+    margin:0; font-size:clamp(24px,2.6vw,34px); font-weight:800; color:#fff;
+    display:flex; align-items:center; gap:14px; position:relative; z-index:1;
+  }
+  .plan-badge{
+    display:inline-block; margin:14px 0 0 0; font-size:14px; font-weight:800;
+    color:var(--navy); background:var(--gold-soft); padding:7px 18px; border-radius:999px;
+    letter-spacing:0.02em; position:relative; z-index:1;
+  }
+  .plan-steps{ list-style:none; margin:34px 0 0 0; padding:0; display:flex; flex-direction:column; gap:18px; position:relative; z-index:1; }
+  .plan-steps li{
+    display:flex; align-items:flex-start; gap:20px;
+    background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+    border-radius:18px; padding:24px 28px;
+    font-size:clamp(17px,1.4vw,20px); line-height:1.6; color:#e4ecf4; font-weight:500;
+    transition:transform .3s cubic-bezier(.22,.61,.36,1), background .3s ease;
+  }
+  .plan-steps li:hover{ transform:translateX(8px); background:rgba(255,255,255,0.12); }
+  .plan-steps .step-icon{ font-size:30px; flex:0 0 auto; line-height:1.2; }
+  .plan-steps b{ color:var(--gold-soft); font-weight:800; }
+
+  /* ---------- 클로징 ---------- */
+  .closing-pillars{ display:flex; gap:24px; margin-top:52px; flex-wrap:wrap; }
+  .pillar{ flex:1; min-width:220px; border:1px solid rgba(255,255,255,0.16); border-radius:20px; padding:28px 26px; background:rgba(255,255,255,0.04); }
+  .pillar .num{ font-size:15px; font-weight:800; color:var(--gold-soft); letter-spacing:0.1em; margin-bottom:10px; }
+  .pillar h4{ margin:0 0 8px 0; font-size:21px; font-weight:800; color:#fff; }
+  .pillar p{ margin:0; font-size:15px; color:#9db0c4; line-height:1.5; }
+
+  @media (max-width:900px){
+    .stat-grid, .line-grid, .two-col{ grid-template-columns:1fr 1fr; }
+    .pipeline{ flex-direction:column; align-items:stretch; }
+    .pipe-arrow{ transform:rotate(90deg); margin:4px auto; }
+    .org-flow{ flex-direction:column; gap:24px; padding:32px; }
+    .org-arrow{ transform:rotate(90deg); }
+    .dot-nav{ display:none; }
+  }
+  @media (max-width:560px){
+    .stat-grid, .line-grid, .two-col{ grid-template-columns:1fr; }
+    .section{ padding:110px 6vw 80px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="bg-motion" aria-hidden="true">
+    <div class="bg-blob a"></div>
+    <div class="bg-blob b"></div>
+    <div class="bg-blob c"></div>
+  </div>
+  <div class="progress-bar" id="progressBar"></div>
+  <nav class="dot-nav" id="dotNav" aria-label="섹션 이동"></nav>
+
+  <!-- 1 : 표지 -->
+  <section class="section dark" id="s1" data-index="1">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+    <svg class="growth-line" viewBox="0 0 400 160" aria-hidden="true">
+      <path d="M10,140 C 80,140 90,60 150,80 C 210,100 230,20 300,30 C 340,36 360,20 390,15" />
+      <circle cx="390" cy="15" r="6"></circle>
+    </svg>
+    <div class="section-inner">
+      <div class="cover-eyebrow reveal">100억 프로젝트 · 진행현황 보고</div>
+      <h1 class="cover-title">
+        <span class="line reveal" data-text="전자책부터 홈페이지까지,">전자책부터 홈페이지까지,</span>
+        <span class="line reveal accent" data-text="시스템으로 만드는 100억">시스템으로 만드는 100억</span>
+      </h1>
+      <p class="cover-sub reveal">콘텐츠 제작 → 다채널 등록 → 홍보까지 반복 재사용 가능한 실행 체계로 사업 포트폴리오를 확장합니다.</p>
+      <div class="cover-date reveal">2026년 9월 · 대표실 보고</div>
+    </div>
+  </section>
+
+  <!-- 2 : 사업 구조 -->
+  <section class="section" id="s2" data-index="2">
+    <div class="float-blob g1"></div>
+    <div class="float-blob g2"></div>
+    <div class="float-blob g3"></div>
+    <div class="page-no"><b>02</b> / 08</div>
+    <div class="section-inner">
+      <span class="eyebrow eyebrow-glow reveal">사업 구조</span>
+      <h1 class="title"><span class="line reveal">4개 사업 라인, <span class="text-shine">하나의 실행 체계</span></span></h1>
+      <p class="subtitle reveal">서로 다른 상품·채널을 대표실 방향 아래 동일한 실행 팀이 운영합니다</p>
+
+      <div class="line-grid">
+        <div class="line-card reveal">
+          <div class="icon-badge">📚</div>
+          <span class="tag">전자책쓰기</span>
+          <h3>디지털 가이드 20권+ 제작</h3>
+          <p>실무 주제 발굴부터 원고·표지·워터마크까지 전 과정 자체 제작</p>
+        </div>
+        <div class="line-card reveal">
+          <div class="icon-badge">⚙️</div>
+          <span class="tag">프로그램제작</span>
+          <h3>Canva 템플릿 상품</h3>
+          <p>상세페이지·배너 등 구매자가 직접 편집하는 디자인 템플릿 판매</p>
+        </div>
+        <div class="line-card reveal">
+          <div class="icon-badge">🌐</div>
+          <span class="tag">홈페이지 제작</span>
+          <h3>자사·관계사 사이트 운영</h3>
+          <p>시니어모델사관학교 등 3개 사이트 실서비스 운영 + 대행 포트폴리오 준비</p>
+        </div>
+        <div class="line-card reveal">
+          <div class="icon-badge">🤖</div>
+          <span class="tag">공용 인프라</span>
+          <h3>리서치 · 자동화</h3>
+          <p>웹 크롤러·콘텐츠 자동화 스킬로 전 사업 라인의 제작 속도를 지원</p>
+        </div>
+      </div>
+
+      <div class="org-flow">
+        <div class="org-node reveal">
+          <div class="icon">🎯</div>
+          <div class="role">대표실</div>
+          <div class="desc">방향 결정</div>
+        </div>
+        <div class="org-arrow">→</div>
+        <div class="org-node reveal">
+          <div class="icon">💻</div>
+          <div class="role">개발팀</div>
+          <div class="desc">상품·시스템 제작</div>
+        </div>
+        <div class="org-arrow">→</div>
+        <div class="org-node reveal">
+          <div class="icon">📣</div>
+          <div class="role">마케팅팀</div>
+          <div class="desc">콘텐츠·홍보</div>
+        </div>
+        <div class="org-arrow">→</div>
+        <div class="org-node reveal">
+          <div class="icon">🤝</div>
+          <div class="role">영업팀</div>
+          <div class="desc">채널 등록·판매</div>
+        </div>
+        <div class="org-arrow">→</div>
+        <div class="org-node reveal">
+          <div class="icon">📊</div>
+          <div class="role">운영팀</div>
+          <div class="desc">현황 관리·품질 점검</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 : 핵심 성과 -->
+  <section class="section" id="s3" data-index="3">
+    <div class="page-no"><b>03</b> / 08</div>
+    <div class="section-inner">
+      <span class="eyebrow reveal">핵심 성과</span>
+      <h1 class="title"><span class="line reveal">20권+ 전자책, 5개 채널 동시 운영</span></h1>
+      <p class="subtitle reveal">제작 속도와 등록 범위 — 상품 포트폴리오의 규모로 실행력을 증명합니다</p>
+
+      <div class="stat-grid">
+        <a class="stat-card reveal" href="https://kmong.com/my-gigs" target="_blank" rel="noopener noreferrer">
+          <div class="stat-num">20<span>권+</span></div>
+          <div class="stat-label">누적 제작 전자책</div>
+          <div class="stat-sub">농지법 · SNS마케팅 · 유튜브부업 등 실무 주제 다각화</div>
+          <span class="stat-link-hint">크몽에서 보기 →</span>
+        </a>
+        <a class="stat-card reveal" href="https://kmong.com/gig/812400" target="_blank" rel="noopener noreferrer">
+          <div class="stat-num">18<span>개</span></div>
+          <div class="stat-label">크몽 상품 등록</div>
+          <div class="stat-sub">대부분 판매중, 신규 상품 지속 등록</div>
+          <span class="stat-link-hint">크몽에서 보기 →</span>
+        </a>
+        <a class="stat-card reveal" href="https://kmong.com/my-gigs" target="_blank" rel="noopener noreferrer">
+          <div class="stat-num">19<span>개</span></div>
+          <div class="stat-label">래피드 상품 등록</div>
+          <div class="stat-sub">자체 판매 채널 병행 운영</div>
+          <span class="stat-link-hint">크몽에서 보기 →</span>
+        </a>
+        <a class="stat-card reveal" href="https://kmong.com/my-gigs" target="_blank" rel="noopener noreferrer">
+          <div class="stat-num">12<span>개</span></div>
+          <div class="stat-label">유페이퍼 등록</div>
+          <div class="stat-sub">전자책 유통 플랫폼 확장</div>
+          <span class="stat-link-hint">크몽에서 보기 →</span>
+        </a>
+      </div>
+
+      <div class="foot-note reveal">
+        <span class="dot"></span>
+        <p>여기에 <em>작가와 · <a href="https://rushnam79-cmyk.github.io/ebook-store/" target="_blank" rel="noopener noreferrer">자사 홈페이지</a> · 블로그</em>까지 더해 5개 이상 채널에서 동시에 판매·홍보가 이루어지고 있습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 : 실행 시스템 -->
+  <section class="section" id="s4" data-index="4">
+    <div class="page-no"><b>04</b> / 08</div>
+    <div class="section-inner">
+      <span class="eyebrow reveal">실행 시스템</span>
+      <h1 class="title"><span class="line reveal">원고 1권 → 5개 채널 자동 등록까지</span></h1>
+      <p class="subtitle reveal">한 번 만든 프로세스를 반복 재사용하는 자동화 파이프라인</p>
+
+      <div class="pipeline">
+        <div class="pipe-step reveal">
+          <div class="pipe-num">1</div>
+          <div class="pipe-label">자료조사 &amp;<br>원고 제작</div>
+          <div class="pipe-sub">주제 발굴 · 집필</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step reveal">
+          <div class="pipe-num">2</div>
+          <div class="pipe-label">표지 디자인</div>
+          <div class="pipe-sub">Canva 후보 3개 중 최선 선택</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step reveal">
+          <div class="pipe-num">3</div>
+          <div class="pipe-label">래피드 &amp; 크몽<br>등록</div>
+          <div class="pipe-sub">1차 판매 채널</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step reveal">
+          <div class="pipe-num">4</div>
+          <div class="pipe-label">유페이퍼 &amp;<br>작가와 등록</div>
+          <div class="pipe-sub">유통 채널 확장</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step reveal">
+          <div class="pipe-num">5</div>
+          <div class="pipe-label">SNS 홍보</div>
+          <div class="pipe-sub">스레드 · 인스타 · 블로그</div>
+        </div>
+      </div>
+
+      <div class="system-caption reveal">
+        <div class="txt">이 순서는 <b>ebook-promo-automation</b> 스킬로 고정되어, 새 상품이 생길 때마다 사람이 매번 순서를 판단하지 않아도 동일한 절차로 반복 실행됩니다.</div>
+        <div class="badge">1권 제작 → 자동 등록</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 : 최근 실행 속도 -->
+  <section class="section" id="s5" data-index="5">
+    <div class="page-no"><b>05</b> / 08</div>
+    <div class="section-inner">
+      <span class="eyebrow reveal">최근 실행 속도</span>
+      <h1 class="title"><span class="line reveal">2주 만에 품질 기준을 끌어올리다</span></h1>
+      <p class="subtitle reveal">지적받은 문제를 그 자리에서 재작업하고, 재발 방지 규칙으로 고정합니다</p>
+
+      <div class="timeline">
+        <div class="tl-item reveal">
+          <div class="tl-date">09-16 ~ 17</div>
+          <div class="tl-body">
+            <h4>"농지 전수조사 가이드" 표지·본문 재작업</h4>
+            <p>CSS 직접 제작 표지 → Canva 재제작, 인포그래픽 4종 추가로 콘텐츠 밀도 보강</p>
+          </div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-date">09-21 ~ 22</div>
+          <div class="tl-body">
+            <h4>가치밀도 기준으로 가격 79,000원 확정</h4>
+            <p>비교군 분석 후 프리미엄 가격 책정, 래피드·크몽 등록과 홈페이지 반영까지 완료</p>
+          </div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-date">09-23</div>
+          <div class="tl-body">
+            <h4>"50대 유튜브 가이드" 20p → 35p 전면 재작업</h4>
+            <p>크몽 3회 비승인 사유(분량 부족)를 13장 → 17장 확장으로 근본 해결</p>
+          </div>
+        </div>
+        <div class="tl-item reveal">
+          <div class="tl-date">09-24</div>
+          <div class="tl-body">
+            <h4>디자인 "원샷 승인" 원칙 확정</h4>
+            <p>표지·메인이미지는 후보 3개 제작 후 최선 선택하도록 스킬에 반영, 재작업 반복 방지</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 : 프로그램제작 · 홈페이지제작 -->
+  <section class="section" id="s6" data-index="6">
+    <div class="float-blob g1"></div>
+    <div class="float-blob g2"></div>
+    <div class="float-blob g3"></div>
+    <div class="page-no"><b>06</b> / 08</div>
+    <div class="section-inner">
+      <span class="eyebrow eyebrow-glow reveal">다른 사업 라인</span>
+      <h1 class="title"><span class="line reveal">프로그램제작 · <span class="text-shine">홈페이지 제작</span></span></h1>
+      <p class="subtitle reveal">전자책 외 두 라인도 동시에 운영 중입니다</p>
+
+      <div class="two-col">
+        <div class="col-card reveal">
+          <span class="status">승인 대기중</span>
+          <h3>⚙️ 프로그램제작</h3>
+          <ul>
+            <li>상세페이지·배너 Canva 템플릿 판매 (와디즈·스마트스토어 스타일)</li>
+            <li>카테고리 오등록으로 비승인된 2개 상품, 올바른 카테고리로 신규 재등록 완료</li>
+            <li>구매자가 직접 편집하는 템플릿 구조로 반복 판매 가능</li>
+          </ul>
+        </div>
+        <div class="col-card reveal">
+          <span class="status">실서비스 운영중</span>
+          <h3>🌐 홈페이지 제작</h3>
+          <ul>
+            <li><a href="https://rushnam79-cmyk.github.io/funlife-senior-model-academy/" target="_blank" rel="noopener noreferrer">시니어모델사관학교</a> · <a href="https://rushnam79-cmyk.github.io/silver-sports-instructor/" target="_blank" rel="noopener noreferrer">실버체육지도자자격증반</a> · <a href="https://sparkly-brigadeiros-a7d9a1.netlify.app/" target="_blank" rel="noopener noreferrer">안전쌤</a> 3개 사이트 실운영</li>
+            <li><a href="https://www.youtube.com/channel/UCBSltzRfn5jmfNsnVzfST0g" target="_blank" rel="noopener noreferrer">유튜브</a> 하이라이트 영상 섹션 등 콘텐츠 지속 업데이트</li>
+            <li>홈페이지 제작 대행 서비스는 포트폴리오 준비 단계</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="store-showcase reveal">
+        <div class="store-media">
+          <img src="images/ebook-store-preview.jpg" alt="펀라이프 전자책 스토어 화면" loading="lazy">
+        </div>
+        <div class="store-body">
+          <span class="store-badge">✨ 자사 브랜드 사이트</span>
+          <h3>펀라이프 전자책 스토어</h3>
+          <p>스마트스토어 · 유튜브 · 리셀 · AI 활용 · 부동산 · SNS마케팅까지, 직접 쓰고 검증한 전자책 18종을 한 곳에 모은 자사 브랜드 홈페이지입니다.</p>
+          <a class="store-cta" href="https://rushnam79-cmyk.github.io/ebook-store/" target="_blank" rel="noopener noreferrer">스토어 바로가기 →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 : 다음 단계 -->
+  <section class="section" id="s7" data-index="7">
+    <div class="page-no"><b>07</b> / 08</div>
+    <div class="section-inner">
+      <span class="eyebrow reveal">다음 단계</span>
+      <h1 class="title"><span class="line reveal">포트폴리오는 갖췄다 — 다음 과제는 트래픽</span></h1>
+      <p class="subtitle reveal">채널로 트래픽을 끌어오는 다음 실행 계획입니다</p>
+
+      <div class="diagnosis">
+        <div class="diag-card plan reveal">
+          <h4>🚀 대응 전략</h4>
+          <span class="plan-badge">growth-flywheel</span>
+          <ul class="plan-steps">
+            <li><span class="step-icon">✍️</span><span><b>저비용 채널(블로그·쇼츠)</b>을 주 2~3회 꾸준히 운영해 트래픽을 만들고</span></li>
+            <li><span class="step-icon">🧲</span><span><b>리드마그넷(무료 콘텐츠)</b>으로 잠재고객을 모으고</span></li>
+            <li><span class="step-icon">🔁</span><span>이미 만들어둔 <b>20권+ 상품</b>으로 다중 판매 연결</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 : 클로징 -->
+  <section class="section dark" id="s8" data-index="8">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="section-inner">
+      <div class="cover-eyebrow reveal">Closing</div>
+      <h1 class="cover-title" style="font-size:clamp(34px,5.4vw,76px);">
+        <span class="line reveal" data-text="100억까지,">100억까지,</span>
+        <span class="line reveal accent" data-text="시스템으로 간다">시스템으로 간다</span>
+      </h1>
+      <p class="cover-sub reveal">포트폴리오는 만들었고, 자동화된 실행 체계도 갖췄습니다. 이제 트래픽을 쌓는 루틴을 고정할 차례입니다.</p>
+      <div class="closing-pillars">
+        <div class="pillar reveal">
+          <div class="num">01</div>
+          <h4>포트폴리오</h4>
+          <p>전자책 20권+ · 5개 채널 동시 등록</p>
+        </div>
+        <div class="pillar reveal">
+          <div class="num">02</div>
+          <h4>실행 시스템</h4>
+          <p>제작부터 등록·홍보까지 자동화된 절차</p>
+        </div>
+        <div class="pillar reveal">
+          <div class="num">03</div>
+          <h4>다음 과제</h4>
+          <p>블로그·쇼츠 루틴으로 트래픽 확보</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<script>
+  // 스크롤 진행률 바
+  const progressBar = document.getElementById('progressBar');
+  function updateProgress(){
+    const h = document.documentElement;
+    const scrolled = h.scrollTop;
+    const max = h.scrollHeight - h.clientHeight;
+    progressBar.style.width = (max > 0 ? (scrolled / max) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive:true });
+  updateProgress();
+
+  // 우측 점 네비게이션
+  const sections = Array.from(document.querySelectorAll('.section'));
+  const dotNav = document.getElementById('dotNav');
+  sections.forEach(sec => {
+    const dot = document.createElement('button');
+    dot.dataset.target = sec.id;
+    dot.setAttribute('aria-label', sec.id);
+    dot.addEventListener('click', () => sec.scrollIntoView({ behavior:'smooth' }));
+    dotNav.appendChild(dot);
+  });
+  const dots = Array.from(dotNav.children);
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        dots.forEach(d => d.classList.toggle('active', d.dataset.target === entry.target.id));
+      }
+    });
+  }, { threshold:0.5 });
+  sections.forEach(sec => navObserver.observe(sec));
+
+  // 커버 타이틀: 글자 단위로 쪼개서 좌측에서 한 글자씩 날아오는 모션
+  document.querySelectorAll('.cover-title .line').forEach((line, lineIndex) => {
+    const text = line.textContent;
+    line.textContent = '';
+    Array.from(text).forEach((ch, i) => {
+      const span = document.createElement('span');
+      span.className = 'char';
+      span.textContent = ch === ' ' ? ' ' : ch;
+      span.style.transitionDelay = (lineIndex * 480 + i * 32) + 'ms';
+      line.appendChild(span);
+    });
+  });
+
+  // 라인/카드 순차 등장 애니메이션
+  const groupSelectors = [
+    '.line-grid > .reveal', '.stat-grid > .reveal', '.pipeline > .reveal',
+    '.org-flow > .reveal', '.timeline > .reveal', '.two-col > .reveal',
+    '.diagnosis > .reveal', '.closing-pillars > .reveal'
+  ];
+  groupSelectors.forEach(sel => {
+    document.querySelectorAll(sel).forEach((el, i) => {
+      el.style.transitionDelay = (i * 110) + 'ms';
+    });
+  });
+  // 제목의 각 줄도 순차 지연
+  document.querySelectorAll('.title .line, .cover-title .line').forEach((el, i) => {
+    el.style.transitionDelay = (i * 160) + 'ms';
+  });
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold:0.15, rootMargin:'0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // 표지는 로드 즉시 보이도록
+  document.querySelectorAll('#s1 .reveal').forEach(el => el.classList.add('in'));
+</script>
+</body>
+</html>
